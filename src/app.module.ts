@@ -3,20 +3,27 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
+import { ConfigModule } from '@nestjs/config';  // Import ConfigModule
 
 @Module({
-  imports: [UsersModule],
-  // imports: [
-  //   TypeOrmModule.forRoot({
-  //     type: 'postgres',
-  //     host: 'localhost', // Change this if you're using a different host
-  //     port: 5432,
-  //     username: 'your_db_user', // Replace with your db username
-  //     password: 'your_db_password', // Replace with your db password
-  //     database: 'users_db', // Replace with your database name
-  //     entities: [__dirname + '/**/*.entity{.ts,.js}'],
-  //     synchronize: true, // Set to false in production to avoid data loss
-  //   })],
+  imports: [
+    // Load the .env file using ConfigModule
+    ConfigModule.forRoot({
+      isGlobal: true,  // Make variables globally available
+      envFilePath: '.env',  // Specify the path to the .env file
+    }),
+    UsersModule,
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: process.env.HOST,
+      port: +process.env.PORT,  // Convert string to number
+      username: process.env.USERNAME,
+      password: process.env.PASSWORD,
+      database: process.env.DATABASE,
+      entities: [__dirname + '/**/*.entity{.ts,.js}'],
+      synchronize: true, // Set to false in production to avoid data loss
+    }),
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
